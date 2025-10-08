@@ -1,14 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { User, Team, UserRole } from '../../../shared/types/user';
-import { getUsers, inviteUser } from '@/api/users';
-import { getTeams, createTeam } from '@/api/teams';
+import { getUsers, inviteUser, updateUser, deleteUser } from '@/api/users';
+import { getTeams, createTeam, deleteTeam } from '@/api/teams';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/useToast';
 import { InviteUserDialog } from '@/components/InviteUserDialog';
 import { CreateTeamDialog } from '@/components/CreateTeamDialog';
-import { Users as UsersIcon, Mail, Shield } from 'lucide-react';
+import { EditUserDialog } from '@/components/EditUserDialog';
+import { Users as UsersIcon, Mail, Shield, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -65,6 +77,60 @@ export const AdminUsers: React.FC = () => {
       toast({
         title: 'Success',
         description: 'Team created successfully'
+      });
+      loadData();
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: 'Error',
+        description: err.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleUpdateUser = async (userId: string, data: { role?: UserRole; teamId?: string; name?: string }) => {
+    try {
+      await updateUser(userId, data);
+      toast({
+        title: 'Success',
+        description: 'User updated successfully'
+      });
+      loadData();
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: 'Error',
+        description: err.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      await deleteUser(userId);
+      toast({
+        title: 'Success',
+        description: 'User deleted successfully'
+      });
+      loadData();
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: 'Error',
+        description: err.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDeleteTeam = async (teamId: string) => {
+    try {
+      await deleteTeam(teamId);
+      toast({
+        title: 'Success',
+        description: 'Team deleted successfully'
       });
       loadData();
     } catch (error) {
@@ -142,9 +208,36 @@ export const AdminUsers: React.FC = () => {
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                  <Badge className={getRoleBadgeColor(user.role)}>
-                    {user.role.toUpperCase()}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={getRoleBadgeColor(user.role)}>
+                      {user.role.toUpperCase()}
+                    </Badge>
+                    <EditUserDialog user={user} onUpdate={handleUpdateUser} teams={teams} />
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete User</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete {user.name || user.email}? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               ))}
             </div>
@@ -167,7 +260,33 @@ export const AdminUsers: React.FC = () => {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">{team.name}</h3>
-                    <Badge variant="outline">{team.icIds.length} ICs</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{team.icIds.length} ICs</Badge>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Team</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete the team "{team.name}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteTeam(team._id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     Manager: {team.managerName || 'Not assigned'}

@@ -120,4 +120,75 @@ router.post('/:id/resend-invite', requireUser([ROLES.ADMIN]), async (req: AuthRe
   }
 });
 
+// Description: Update user details (role, team)
+// Endpoint: PUT /api/users/:id
+// Request: { role?: string, teamId?: string, name?: string }
+// Response: { success: boolean, message: string, user: User }
+router.put('/:id', requireUser([ROLES.ADMIN]), async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { role, teamId, name } = req.body;
+
+    console.log(`Admin ${req.user.email} updating user ${id}`);
+
+    // Validate role if provided
+    if (role && !Object.values(ROLES).includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (role) updateData.role = role;
+    if (teamId !== undefined) updateData.teamId = teamId || null;
+    if (name) updateData.name = name;
+
+    const user = await UserService.update(id, updateData);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      user,
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error updating user:', errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// Description: Delete a user
+// Endpoint: DELETE /api/users/:id
+// Request: {}
+// Response: { success: boolean, message: string }
+router.delete('/:id', requireUser([ROLES.ADMIN]), async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent admin from deleting themselves
+    if (req.user._id.toString() === id) {
+      return res.status(400).json({ error: 'You cannot delete your own account' });
+    }
+
+    console.log(`Admin ${req.user.email} deleting user ${id}`);
+
+    const deleted = await UserService.delete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error deleting user:', errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
 export default router;

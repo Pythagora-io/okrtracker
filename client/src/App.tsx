@@ -24,7 +24,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/setup-password/:token" element={<SetupPassword />} />
+          <Route path="/setup-password" element={<SetupPassword />} />
           <Route path="/" element={<ProtectedRoute> <Layout /> </ProtectedRoute>}>
             <Route index element={<Home />} />
             <Route path="admin/users" element={<AdminUsers />} />

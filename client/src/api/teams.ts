@@ -70,3 +70,17 @@ export const getTeamsByManager = async (managerId: string) => {
     throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
   }
 };
+
+// Description: Delete a team
+// Endpoint: DELETE /api/teams/:id
+// Request: {}
+// Response: { success: boolean, message: string }
+export const deleteTeam = async (id: string) => {
+  try {
+    const response = await api.delete(`/api/teams/${id}`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error(error);
+    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+  }
+};

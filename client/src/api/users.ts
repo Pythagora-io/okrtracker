@@ -42,3 +42,31 @@ export const getUserById = async (id: string) => {
     throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
   }
 };
+
+// Description: Update user details
+// Endpoint: PUT /api/users/:id
+// Request: { role?: string, teamId?: string, name?: string }
+// Response: { success: boolean, message: string, user: User }
+export const updateUser = async (id: string, data: { role?: string; teamId?: string; name?: string }) => {
+  try {
+    const response = await api.put(`/api/users/${id}`, data);
+    return response.data;
+  } catch (error: unknown) {
+    console.error(error);
+    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+  }
+};
+
+// Description: Delete a user
+// Endpoint: DELETE /api/users/:id
+// Request: {}
+// Response: { success: boolean, message: string }
+export const deleteUser = async (id: string) => {
+  try {
+    const response = await api.delete(`/api/users/${id}`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error(error);
+    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+  }
+};
