@@ -78,18 +78,21 @@ export const ManagerTeams: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Team Members</span>
-                  <Badge variant="secondary">{team.icIds.length} ICs</Badge>
+                  <Badge variant="secondary">{team.icIds?.length || 0} ICs</Badge>
                 </div>
-                {team.ics && team.ics.length > 0 && (
+                {Array.isArray(team.icIds) && team.icIds.length > 0 && team.icIds.some(ic => typeof ic === 'object') && (
                   <div className="flex flex-wrap gap-1">
-                    {team.ics.slice(0, 3).map((ic) => (
-                      <Badge key={ic._id} variant="outline" className="text-xs">
-                        {ic.name || ic.email.split('@')[0]}
-                      </Badge>
-                    ))}
-                    {team.ics.length > 3 && (
+                    {team.icIds.slice(0, 3).map((ic) => {
+                      if (typeof ic === 'string') return null;
+                      return (
+                        <Badge key={ic._id} variant="outline" className="text-xs">
+                          {ic.name || ic.email.split('@')[0]}
+                        </Badge>
+                      );
+                    })}
+                    {team.icIds.length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{team.ics.length - 3} more
+                        +{team.icIds.length - 3} more
                       </Badge>
                     )}
                   </div>

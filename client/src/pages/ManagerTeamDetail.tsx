@@ -67,39 +67,44 @@ export const ManagerTeamDetail: React.FC = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {team.ics && team.ics.map((ic: User) => (
-          <Card
-            key={ic._id}
-            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
-            onClick={() => navigate(`/manager/ic/${ic._id}`)}
-          >
-            <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5">
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <UserIcon className="h-5 w-5 text-primary" />
+        {Array.isArray(team.icIds) && team.icIds.length > 0 && team.icIds.map((ic: User | string) => {
+          // Handle both populated and unpopulated icIds
+          if (typeof ic === 'string') return null;
+
+          return (
+            <Card
+              key={ic._id}
+              className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+              onClick={() => navigate(`/manager/ic/${ic._id}`)}
+            >
+              <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <UserIcon className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="text-base">{ic.name || ic.email.split('@')[0]}</span>
                   </div>
-                  <span className="text-base">{ic.name || ic.email.split('@')[0]}</span>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                    {ic.email}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Last activity: {format(new Date(ic.updatedAt), 'MMM d, yyyy')}
+                  </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  {ic.email}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Last activity: {format(new Date(ic.updatedAt), 'MMM d, yyyy')}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {(!team.ics || team.ics.length === 0) && (
+      {(!team.icIds || team.icIds.length === 0) && (
         <Card className="p-12">
           <div className="text-center">
             <UserIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

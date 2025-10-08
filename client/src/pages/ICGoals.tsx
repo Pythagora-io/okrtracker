@@ -33,14 +33,19 @@ export const ICGoals: React.FC = () => {
     try {
       setLoading(true);
       const data = await getGoalsByUser(currentUser._id);
-      const goalsData = (data as { goals: WeekGoal[] }).goals;
+      let goalsData = (data as { goals: WeekGoal[] }).goals;
 
-      // If no goals exist, create empty goals for current and past weeks
-      if (goalsData.length === 0) {
-        const weeks = generateWeeks(12);
-        const currentWeek = weeks[0];
+      // Generate the current week
+      const weeks = generateWeeks(1);
+      const currentWeek = weeks[0];
 
-        // Create a goal entry for the current week
+      // Check if current week exists in loaded goals
+      const hasCurrentWeek = goalsData.some(
+        goal => goal.weekStart === currentWeek.start && goal.weekEnd === currentWeek.end
+      );
+
+      // If current week doesn't exist, create it
+      if (!hasCurrentWeek) {
         await saveGoals({
           userId: currentUser._id,
           weekStart: currentWeek.start,
@@ -48,25 +53,23 @@ export const ICGoals: React.FC = () => {
           goalsContent: ''
         });
 
-        // Reload goals after creating the initial entry
+        // Reload goals after creating the current week entry
         const updatedData = await getGoalsByUser(currentUser._id);
-        const updatedGoals = (updatedData as { goals: WeekGoal[] }).goals;
-        setGoals(updatedGoals);
-
-        const resultsMap: { [key: string]: string } = {};
-        updatedGoals.forEach((goal: WeekGoal) => {
-          resultsMap[goal._id] = goal.resultsContent || '';
-        });
-        setResultsText(resultsMap);
-      } else {
-        setGoals(goalsData);
-
-        const resultsMap: { [key: string]: string } = {};
-        goalsData.forEach((goal: WeekGoal) => {
-          resultsMap[goal._id] = goal.resultsContent || '';
-        });
-        setResultsText(resultsMap);
+        goalsData = (updatedData as { goals: WeekGoal[] }).goals;
       }
+
+      // Sort goals by weekStart descending (newest first)
+      const sortedGoals = [...goalsData].sort((a, b) =>
+        new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime()
+      );
+
+      setGoals(sortedGoals);
+
+      const resultsMap: { [key: string]: string } = {};
+      sortedGoals.forEach((goal: WeekGoal) => {
+        resultsMap[goal._id] = goal.resultsContent || '';
+      });
+      setResultsText(resultsMap);
     } catch (error) {
       const err = error as Error;
       toast({

@@ -120,7 +120,7 @@
 	"client/src/pages/Home.tsx": "Home page component that automatically redirects users to their role-specific dashboard based on stored user role, displaying a loading spinner during navigation.",
 	"client/src/pages/ICGoals.tsx": "Individual contributor goals management page with functionality to set, save, submit, and comment on weekly goals and results, featuring rich text editing and interactive comment threads.",
 	"client/src/pages/ManagerICDetail.tsx": "Manager-facing individual contributor (IC) detail page with comprehensive goal tracking, commenting, and chat functionality for weekly objectives and results.",
-	"client/src/pages/ManagerTeamDetail.tsx": "React component for displaying detailed team information, rendering team members' cards with individual details and navigation options for managers.",
+	"client/src/pages/ManagerTeamDetail.tsx": "React component for displaying detailed team information, rendering team members as interactive cards with personal details and navigation options for managers.",
 	"client/src/pages/SetupPassword.tsx": "React component for setting up a user password via an invite token, with password strength validation, name input, and secure signup process.",
 	"server/models/Settings.ts": "Mongoose schema for configuring time-based settings with day, hour, minute, and timezone, supporting default values and timestamp tracking.",
 	"server/models/Team.ts": "Mongoose schema for Team model, defining team structure with name, manager, team members, and automatic timestamp tracking.",
