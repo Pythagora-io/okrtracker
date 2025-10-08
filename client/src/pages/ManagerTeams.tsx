@@ -13,14 +13,14 @@ export const ManagerTeams: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     loadTeams();
   }, []);
 
   const loadTeams = async () => {
-    if (!user) {
+    if (!currentUser) {
       console.error('No authenticated user found');
       setLoading(false);
       return;
@@ -28,7 +28,7 @@ export const ManagerTeams: React.FC = () => {
 
     try {
       setLoading(true);
-      const data = await getTeamsByManager(user._id);
+      const data = await getTeamsByManager(currentUser._id);
       setTeams((data as { teams: Team[] }).teams);
     } catch (error) {
       const err = error as Error;

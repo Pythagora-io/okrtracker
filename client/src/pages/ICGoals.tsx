@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { generateWeeks } from '@/utils/dateUtils';
 
 export const ICGoals: React.FC = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [goals, setGoals] = useState<WeekGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingGoals, setSavingGoals] = useState<{ [key: string]: boolean }>({});
@@ -22,17 +22,17 @@ export const ICGoals: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
+    if (currentUser) {
       loadGoals();
     }
-  }, [user]);
+  }, [currentUser]);
 
   const loadGoals = async () => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       setLoading(true);
-      const data = await getGoalsByUser(user._id);
+      const data = await getGoalsByUser(currentUser._id);
       const goalsData = (data as { goals: WeekGoal[] }).goals;
 
       // If no goals exist, create empty goals for current and past weeks
@@ -42,14 +42,14 @@ export const ICGoals: React.FC = () => {
 
         // Create a goal entry for the current week
         await saveGoals({
-          userId: user._id,
+          userId: currentUser._id,
           weekStart: currentWeek.start,
           weekEnd: currentWeek.end,
           goalsContent: ''
         });
 
         // Reload goals after creating the initial entry
-        const updatedData = await getGoalsByUser(user._id);
+        const updatedData = await getGoalsByUser(currentUser._id);
         const updatedGoals = (updatedData as { goals: WeekGoal[] }).goals;
         setGoals(updatedGoals);
 
@@ -80,14 +80,14 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleSaveGoals = async (goalId: string, content: string) => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       setSavingGoals({ ...savingGoals, [goalId]: true });
       const goal = goals.find(g => g._id === goalId);
       if (goal) {
         await saveGoals({
-          userId: user._id,
+          userId: currentUser._id,
           weekStart: goal.weekStart,
           weekEnd: goal.weekEnd,
           goalsContent: content
@@ -134,13 +134,13 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleAddComment = async (goalId: string, text: string, position: number) => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       const comment = await addComment(goalId, {
-        userId: user._id,
-        userName: user.name || user.email,
-        userRole: user.role,
+        userId: currentUser._id,
+        userName: currentUser.name || currentUser.email,
+        userRole: currentUser.role,
         text,
         highlightedText: text,
         position
@@ -167,12 +167,12 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleReplyToComment = async (goalId: string, commentId: string, text: string) => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       const reply = await replyToComment(goalId, commentId, {
-        userId: user._id,
-        userName: user.name || user.email,
+        userId: currentUser._id,
+        userName: currentUser.name || currentUser.email,
         text
       });
 
@@ -294,8 +294,8 @@ export const ICGoals: React.FC = () => {
                           comment={comment}
                           onReply={(commentId, text) => handleReplyToComment(goal._id, commentId, text)}
                           onResolve={(commentId) => handleResolveComment(goal._id, commentId)}
-                          currentUserId={user?._id || ''}
-                          currentUserName={user?.name || user?.email || ''}
+                          currentUserId={currentUser?._id || ''}
+                          currentUserName={currentUser?.name || currentUser?.email || ''}
                         />
                       ))}
                     </div>

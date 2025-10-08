@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const ManagerICDetail: React.FC = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const { icId } = useParams<{ icId: string }>();
   const [ic, setIc] = useState<User | null>(null);
   const [goals, setGoals] = useState<WeekGoal[]>([]);
@@ -74,13 +74,13 @@ export const ManagerICDetail: React.FC = () => {
   };
 
   const handleAddComment = async (goalId: string, text: string, position: number) => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       const comment = await addComment(goalId, {
-        userId: user._id,
-        userName: user.name || user.email,
-        userRole: user.role,
+        userId: currentUser._id,
+        userName: currentUser.name || currentUser.email,
+        userRole: currentUser.role,
         text,
         highlightedText: text,
         position
@@ -107,12 +107,12 @@ export const ManagerICDetail: React.FC = () => {
   };
 
   const handleReplyToComment = async (goalId: string, commentId: string, text: string) => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       const reply = await replyToComment(goalId, commentId, {
-        userId: user._id,
-        userName: user.name || user.email,
+        userId: currentUser._id,
+        userName: currentUser.name || currentUser.email,
         text
       });
 
@@ -173,12 +173,12 @@ export const ManagerICDetail: React.FC = () => {
   };
 
   const handleSendChatMessage = async (goalId: string, message: string): Promise<ChatMessage> => {
-    if (!user) throw new Error('User not authenticated');
+    if (!currentUser) throw new Error('User not authenticated');
 
     try {
       const response = await sendChatMessage({
         goalId,
-        userId: user._id,
+        userId: currentUser._id,
         message
       });
       return (response as { message: ChatMessage }).message;
@@ -247,8 +247,8 @@ export const ManagerICDetail: React.FC = () => {
                           comment={comment}
                           onReply={(commentId, text) => handleReplyToComment(goal._id, commentId, text)}
                           onResolve={(commentId) => handleResolveComment(goal._id, commentId)}
-                          currentUserId={user?._id || ''}
-                          currentUserName={user?.name || user?.email || ''}
+                          currentUserId={currentUser?._id || ''}
+                          currentUserName={currentUser?.name || currentUser?.email || ''}
                         />
                       ))}
                     </div>
