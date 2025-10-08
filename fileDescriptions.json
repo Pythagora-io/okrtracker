@@ -115,7 +115,7 @@
 	"shared/package.json": "Package configuration for shared TypeScript module with build scripts, linting, and development utilities for a reusable library.",
 	"shared/tsconfig.json": "TypeScript compiler configuration for shared library, setting strict type checking, module resolution, and build output options for TypeScript files.",
 	"shared/config/roles.ts": "Role configuration module defining application user roles with type-safe constants for admin, manager, and IC permissions.",
-	"shared/types/user.ts": "TypeScript type definitions for user-related entities including roles, user profiles, teams, week goals, comments, replies, automation settings, and chat messages.",
+	"shared/types/user.ts": "TypeScript type definitions for user-related entities, including User, Team, WeekGoal, Comment, Reply, AutomationSettings, and ChatMessage, with associated enums and interfaces for role-based access and data modeling.",
 	"client/src/components/RoleBasedRoute.tsx": "Role-based route protection component that redirects unauthorized users based on their role, ensuring access control for specific routes in the application.",
 	"client/src/pages/Home.tsx": "Home page component that automatically redirects authenticated users to their role-specific dashboard based on user permissions, displaying a loading spinner during navigation.",
 	"client/src/pages/ICGoals.tsx": "React component for managing weekly goals, enabling users to set, save, submit results, and collaborate through comments and replies for individual goal tracking.",
@@ -138,5 +138,7 @@
 	"server/routes/chatRoutes.ts": "Express router handling chat-related API endpoints for sending messages to an LLM and retrieving chat history for specific goals, with user authentication middleware.",
 	"server/routes/goalRoutes.ts": "Express router handling goal-related API endpoints with user authentication, supporting operations like retrieving, saving, submitting goals, adding comments, and managing goal interactions with role-based access control.",
 	"server/services/chatService.ts": "Chat service managing AI-powered conversations for goal tracking, handling message processing, chat history retrieval, and context generation for language model interactions.",
-	"server/services/goalService.ts": "Goal service managing user goal lifecycle, providing methods for creating, submitting, commenting on, and retrieving goals with integrated email notifications and comprehensive error handling."
+	"server/services/goalService.ts": "Goal service managing user goal lifecycle, providing methods for creating, submitting, commenting on, and retrieving goals with integrated email notifications and comprehensive error handling.",
+	"shared/dist/types/user.d.ts": "TypeScript type definitions for user-related data models, including enums for user roles, interfaces for users, teams, week goals, comments, replies, automation settings, and chat messages.",
+	"shared/dist/types/user.d.ts.map": "TypeScript source map for user-related type definitions, providing type interfaces for user profiles, authentication, and metadata structures."
 }

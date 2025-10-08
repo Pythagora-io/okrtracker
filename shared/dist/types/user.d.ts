@@ -17,7 +17,7 @@ export interface Team {
     name: string;
     managerId: string;
     managerName?: string;
-    icIds: string[];
+    icIds: string[] | User[];
     ics?: User[];
     createdAt: string;
     updatedAt: string;
