@@ -24,6 +24,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [showCommentButton, setShowCommentButton] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [selectionPosition, setSelectionPosition] = useState(0);
+  const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
+  const [activeCommentInput, setActiveCommentInput] = useState<string | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -60,6 +62,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       onAddComment(selectedText, selectionPosition);
       setShowCommentButton(false);
       editor?.commands.setTextSelection({ from: 0, to: 0 });
+      
+      const { from, to } = editor.state.selection
+      const text = editor.state.doc.textBetween(from, to)
+      
+      const newCommentId = `temp-${from}-${to}`
+      setActiveCommentInput(newCommentId)
+      
+      setTimeout(() => {
+        const inputElement = document.querySelector(`[data-comment-input="${newCommentId}"]`)
+        if (inputElement instanceof HTMLElement) {
+          inputElement.focus()
+        }
+      }, 100)
     }
   };
 
