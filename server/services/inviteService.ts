@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto';
 import User, { IUser } from '../models/User';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import emailService from './emailService';
 
 interface InviteUserData {
   email: string;
@@ -63,9 +64,15 @@ class InviteService {
 
       console.log(`Successfully created invite for ${email} with token ${inviteToken}`);
 
-      // TODO: Send invite email with link containing token
-      // For now, we'll just log it
-      console.log(`Invite link: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/setup-password?token=${inviteToken}`);
+      // Send invite email
+      try {
+        await emailService.sendInviteEmail(email, role, inviteToken);
+      } catch (emailError) {
+        const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown error';
+        console.error('Failed to send invite email, but user was created:', errorMessage);
+        // Don't throw - user was created successfully, email is just a notification
+        console.log(`Invite link (email failed): ${process.env.FRONTEND_URL || 'http://localhost:5173'}/setup-password?token=${inviteToken}`);
+      }
 
       return user;
     } catch (err) {
@@ -149,7 +156,16 @@ class InviteService {
       await user.save();
 
       console.log(`Successfully resent invite for ${user.email}`);
-      console.log(`Invite link: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/setup-password?token=${user.inviteToken}`);
+
+      // Send invite email
+      try {
+        await emailService.sendInviteEmail(user.email, user.role, user.inviteToken!);
+      } catch (emailError) {
+        const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown error';
+        console.error('Failed to send invite email:', errorMessage);
+        // Don't throw - just log the link
+        console.log(`Invite link (email failed): ${process.env.FRONTEND_URL || 'http://localhost:5173'}/setup-password?token=${user.inviteToken}`);
+      }
 
       return user;
     } catch (err) {
