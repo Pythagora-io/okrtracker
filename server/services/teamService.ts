@@ -57,6 +57,9 @@ class TeamService {
         .populate('icIds', 'email name role teamId')
         .exec();
       console.log(`Successfully fetched ${teams.length} teams for manager ${managerId}`);
+      teams.forEach(team => {
+        console.log(`Team ${team.name}: ${team.icIds?.length || 0} ICs`, team.icIds);
+      });
       return teams;
     } catch (err) {
       console.error(`Error getting teams for manager ${managerId}:`, err);

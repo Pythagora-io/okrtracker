@@ -8,6 +8,35 @@ import { Textarea } from './ui/textarea';
 import { Card } from './ui/card';
 import { cn } from '@/lib/utils';
 
+// Styles for the editor content
+const editorStyles = `
+  .ProseMirror {
+    outline: none;
+  }
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  .ProseMirror ul {
+    list-style-type: disc;
+  }
+  .ProseMirror ol {
+    list-style-type: decimal;
+  }
+  .ProseMirror li {
+    margin: 0.25rem 0;
+  }
+  .ProseMirror h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 1em 0 0.5em 0;
+  }
+  .ProseMirror p {
+    margin: 0.5em 0;
+  }
+`;
+
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
@@ -87,13 +116,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div className="relative">
+      <style dangerouslySetInnerHTML={{ __html: editorStyles }} />
       {!readOnly && (
         <div className="flex items-center gap-1 p-2 border-b bg-muted/30 rounded-t-lg">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleBold().run()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleBold().run();
+            }}
             className={cn(editor.isActive('bold') && 'bg-accent')}
           >
             <Bold className="h-4 w-4" />
@@ -102,7 +135,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleItalic().run();
+            }}
             className={cn(editor.isActive('italic') && 'bg-accent')}
           >
             <Italic className="h-4 w-4" />
@@ -111,7 +147,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleBulletList().run();
+            }}
             className={cn(editor.isActive('bulletList') && 'bg-accent')}
           >
             <List className="h-4 w-4" />
@@ -120,7 +159,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleOrderedList().run();
+            }}
             className={cn(editor.isActive('orderedList') && 'bg-accent')}
           >
             <ListOrdered className="h-4 w-4" />
@@ -129,7 +171,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleHeading({ level: 2 }).run();
+            }}
             className={cn(editor.isActive('heading', { level: 2 }) && 'bg-accent')}
           >
             <Heading2 className="h-4 w-4" />
@@ -138,11 +183,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       )}
 
       <div className={cn(
-        "prose prose-sm dark:prose-invert max-w-none p-4 min-h-[200px] focus:outline-none",
-        "prose-headings:font-bold prose-h2:text-xl",
-        "prose-ul:list-disc prose-ul:pl-6",
-        "prose-ol:list-decimal prose-ol:pl-6",
-        "prose-li:my-1",
+        "p-4 min-h-[200px]",
         !readOnly && "border rounded-b-lg bg-background",
         readOnly && "bg-muted/20 rounded-lg"
       )}>
