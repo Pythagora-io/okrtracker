@@ -149,6 +149,6 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   );
 };
 
-function cn(...classes: any[]) {
+function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ');
 }

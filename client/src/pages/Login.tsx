@@ -1,52 +1,42 @@
 import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert" // pythagora_mocked_data - DO NOT REMOVE THIS COMMENT
-import { useToast } from "@/hooks/useToast"
-import {
-  LogIn
-  , LightbulbIcon // pythagora_mocked_data - DO NOT REMOVE THIS COMMENT
-} from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/AuthContext"
-
-type LoginForm = {
-  email: string
-  password: string
-}
+import { useToast } from "@/hooks/useToast"
+import { LogIn } from "lucide-react"
 
 export function Login() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
   const { login } = useAuth()
   const navigate = useNavigate()
-  const { register, handleSubmit } = useForm<LoginForm>()
+  const { toast } = useToast()
 
-  const onSubmit = async (data: LoginForm) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
     try {
-      setLoading(true)
-      await login(data.email, data.password);
+      await login(email, password)
+      
+      const mockRole = email.includes('admin') ? 'admin' : email.includes('manager') ? 'manager' : 'ic'
+      localStorage.setItem('userRole', mockRole)
+      
       toast({
         title: "Success",
         description: "Logged in successfully",
       })
       navigate("/")
     } catch (error) {
-      console.error("Login error:", error.message)
+      const err = error as Error;
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error?.message,
+        description: err.message,
+        variant: "destructive",
       })
     } finally {
       setLoading(false)
@@ -54,29 +44,30 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Enter your credentials to continue</CardDescription>
+        <CardHeader className="space-y-1 bg-gradient-to-r from-primary/10 to-primary/5">
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+              <LogIn className="h-6 w-6 text-primary" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+          <CardDescription className="text-center">
+            Sign in to your OKR Tracker account
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Alert className="mb-6 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30 dark:border-yellow-900/50 p-4">{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-            <div className="flex items-center space-x-4">{/*pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-              <LightbulbIcon className="h-6 w-6 text-yellow-500 dark:text-yellow-400 flex-shrink-0 stroke-[1.5] filter drop-shadow-sm" />{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-              <AlertDescription className="text-yellow-800 dark:text-yellow-200 flex-1 min-w-0">{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-                Pythagora: You can use any email/password in the frontend phase{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-              </AlertDescription>{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-            </div>{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-          </Alert>{ /* pythagora_mocked_data - DO NOT REMOVE THIS COMMENT */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
-                {...register("email", { required: true })}
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -84,31 +75,29 @@ export function Login() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
-                {...register("password", { required: true })}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
-                "Loading..."
-              ) : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
                 </>
+              ) : (
+                "Sign In"
               )}
             </Button>
           </form>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-primary hover:underline">
+              Sign up
+            </Link>
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button
-            variant="link"
-            className="text-sm text-muted-foreground"
-            onClick={() => navigate("/register")}
-          >
-            Don't have an account? Sign up
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   )

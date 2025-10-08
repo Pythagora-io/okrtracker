@@ -27,9 +27,10 @@ export const AdminUsers: React.FC = () => {
         getUsers(),
         getTeams()
       ]);
-      setUsers((usersData as any).users);
-      setTeams((teamsData as any).teams);
-    } catch (error: any) {
+      setUsers((usersData as { users: User[] }).users);
+      setTeams((teamsData as { teams: Team[] }).teams);
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
         description: error.message,
@@ -48,10 +49,11 @@ export const AdminUsers: React.FC = () => {
         description: 'User invitation sent successfully'
       });
       loadData();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     }
@@ -65,10 +67,11 @@ export const AdminUsers: React.FC = () => {
         description: 'Team created successfully'
       });
       loadData();
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     }

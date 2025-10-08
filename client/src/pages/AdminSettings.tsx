@@ -26,12 +26,13 @@ export const AdminSettings: React.FC = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const data = await getAutomationSettings();
-      setSettings((data as any).settings);
-    } catch (error: any) {
+      const data = await getAutomationSettings() as { settings: AutomationSettings };
+      setSettings(data.settings);
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     } finally {
@@ -47,10 +48,11 @@ export const AdminSettings: React.FC = () => {
         title: 'Success',
         description: 'Automation settings updated successfully'
       });
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     } finally {

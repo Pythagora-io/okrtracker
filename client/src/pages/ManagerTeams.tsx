@@ -23,11 +23,12 @@ export const ManagerTeams: React.FC = () => {
       // In real implementation, get current user ID from auth context
       const managerId = '2'; // Mock manager ID
       const data = await getTeamsByManager(managerId);
-      setTeams((data as any).teams);
-    } catch (error: any) {
+      setTeams((data as { teams: Team[] }).teams);
+    } catch (error) {
+      const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     } finally {
