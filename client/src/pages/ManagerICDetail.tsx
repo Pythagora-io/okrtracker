@@ -73,7 +73,7 @@ export const ManagerICDetail: React.FC = () => {
     }
   };
 
-  const handleAddComment = async (goalId: string, text: string, position: number) => {
+  const handleAddComment = async (goalId: string, text: string, highlightedText: string, position: number) => {
     if (!currentUser) return;
 
     try {
@@ -82,7 +82,7 @@ export const ManagerICDetail: React.FC = () => {
         userName: currentUser.name || currentUser.email,
         userRole: currentUser.role,
         text,
-        highlightedText: text,
+        highlightedText,
         position
       });
 
@@ -233,7 +233,7 @@ export const ManagerICDetail: React.FC = () => {
                 <RichTextEditor
                   content={goal.goalsContent}
                   onChange={(content) => handleGoalsChange(goal._id, content)}
-                  onAddComment={(text, position) => handleAddComment(goal._id, text, position)}
+                  onAddComment={(text, highlightedText, position) => handleAddComment(goal._id, text, highlightedText, position)}
                   placeholder="Set goals for this week..."
                 />
 

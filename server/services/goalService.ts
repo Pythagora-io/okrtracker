@@ -96,7 +96,8 @@ class GoalService {
               manager.name || 'Manager',
               user.name || user.email,
               goal.weekStart,
-              goal.weekEnd
+              goal.weekEnd,
+              userId
             );
           }
         }
@@ -144,7 +145,8 @@ class GoalService {
               manager.name || 'Manager',
               user.name || user.email,
               goal.weekStart,
-              goal.weekEnd
+              goal.weekEnd,
+              userId
             );
           }
         }
@@ -211,7 +213,9 @@ class GoalService {
             commentData.text,
             goal.weekStart,
             goal.weekEnd,
-            'goal'
+            'goal',
+            goal.userId.toString(),
+            goalOwner.role
           );
         }
       } else {
@@ -230,7 +234,9 @@ class GoalService {
                 commentData.text,
                 goal.weekStart,
                 goal.weekEnd,
-                'goal'
+                'goal',
+                goal.userId.toString(),
+                manager.role
               );
             }
           }
@@ -296,7 +302,9 @@ class GoalService {
             replyData.text,
             comment.text,
             goal.weekStart,
-            goal.weekEnd
+            goal.weekEnd,
+            goal.userId.toString(),
+            commentAuthor.role
           );
         }
       }

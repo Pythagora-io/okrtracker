@@ -60,7 +60,8 @@ class EmailService {
     managerName: string,
     icName: string,
     weekStart: Date,
-    weekEnd: Date
+    weekEnd: Date,
+    icId: string
   ): Promise<void> {
     this.initialize();
 
@@ -69,7 +70,7 @@ class EmailService {
       return;
     }
 
-    const viewLink = `${this.frontendUrl}/manager/teams`;
+    const viewLink = `${this.frontendUrl}/manager/ic/${icId}`;
 
     try {
       console.log(`Sending goals submitted email to ${managerEmail}`);
@@ -96,7 +97,8 @@ class EmailService {
     managerName: string,
     icName: string,
     weekStart: Date,
-    weekEnd: Date
+    weekEnd: Date,
+    icId: string
   ): Promise<void> {
     this.initialize();
 
@@ -105,7 +107,7 @@ class EmailService {
       return;
     }
 
-    const viewLink = `${this.frontendUrl}/manager/teams`;
+    const viewLink = `${this.frontendUrl}/manager/ic/${icId}`;
 
     try {
       console.log(`Sending results submitted email to ${managerEmail}`);
@@ -134,7 +136,9 @@ class EmailService {
     commentText: string,
     weekStart: Date,
     weekEnd: Date,
-    type: 'goal' | 'result'
+    type: 'goal' | 'result',
+    icId: string,
+    recipientRole: string
   ): Promise<void> {
     this.initialize();
 
@@ -143,7 +147,10 @@ class EmailService {
       return;
     }
 
-    const viewLink = `${this.frontendUrl}/manager/teams`;
+    // If recipient is manager, link to IC detail page; if recipient is IC, link to their goals page
+    const viewLink = recipientRole === 'manager'
+      ? `${this.frontendUrl}/manager/ic/${icId}`
+      : `${this.frontendUrl}/ic/goals`;
 
     try {
       console.log(`Sending comment notification email to ${recipientEmail}`);
@@ -172,7 +179,9 @@ class EmailService {
     replyText: string,
     originalComment: string,
     weekStart: Date,
-    weekEnd: Date
+    weekEnd: Date,
+    icId: string,
+    recipientRole: string
   ): Promise<void> {
     this.initialize();
 
@@ -181,7 +190,10 @@ class EmailService {
       return;
     }
 
-    const viewLink = `${this.frontendUrl}/manager/teams`;
+    // If recipient is manager, link to IC detail page; if recipient is IC, link to their goals page
+    const viewLink = recipientRole === 'manager'
+      ? `${this.frontendUrl}/manager/ic/${icId}`
+      : `${this.frontendUrl}/ic/goals`;
 
     try {
       console.log(`Sending reply notification email to ${recipientEmail}`);

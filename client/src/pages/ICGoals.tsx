@@ -136,7 +136,7 @@ export const ICGoals: React.FC = () => {
     }
   };
 
-  const handleAddComment = async (goalId: string, text: string, position: number) => {
+  const handleAddComment = async (goalId: string, text: string, highlightedText: string, position: number) => {
     if (!currentUser) return;
 
     try {
@@ -145,7 +145,7 @@ export const ICGoals: React.FC = () => {
         userName: currentUser.name || currentUser.email,
         userRole: currentUser.role,
         text,
-        highlightedText: text,
+        highlightedText,
         position
       });
 
@@ -264,7 +264,7 @@ export const ICGoals: React.FC = () => {
                   onChange={(content) => {
                     setGoals(goals.map(g => g._id === goal._id ? { ...g, goalsContent: content } : g));
                   }}
-                  onAddComment={(text, position) => handleAddComment(goal._id, text, position)}
+                  onAddComment={(text, highlightedText, position) => handleAddComment(goal._id, text, highlightedText, position)}
                   placeholder="Set your goals for this week..."
                 />
 

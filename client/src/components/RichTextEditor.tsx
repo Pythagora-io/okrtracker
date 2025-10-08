@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
-  onAddComment?: (text: string, position: number) => void;
+  onAddComment?: (text: string, highlightedText: string, position: number) => void;
   readOnly?: boolean;
   placeholder?: string;
 }
@@ -66,7 +66,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleSubmitComment = () => {
     if (onAddComment && commentText.trim() && selectedText) {
-      onAddComment(commentText, selectionPosition);
+      onAddComment(commentText, selectedText, selectionPosition);
       setShowCommentInput(false);
       setCommentText('');
       setSelectedText('');
@@ -138,7 +138,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       )}
 
       <div className={cn(
-        "prose prose-sm max-w-none p-4 min-h-[200px] focus:outline-none",
+        "prose prose-sm dark:prose-invert max-w-none p-4 min-h-[200px] focus:outline-none",
+        "prose-headings:font-bold prose-h2:text-xl",
+        "prose-ul:list-disc prose-ul:pl-6",
+        "prose-ol:list-decimal prose-ol:pl-6",
+        "prose-li:my-1",
         !readOnly && "border rounded-b-lg bg-background",
         readOnly && "bg-muted/20 rounded-lg"
       )}>

@@ -11,7 +11,8 @@ export const getTeams = async () => {
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to fetch teams');
   }
 };
 
@@ -25,7 +26,8 @@ export const createTeam = async (data: { name: string; managerId: string; icIds:
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to create team');
   }
 };
 
@@ -39,7 +41,8 @@ export const updateTeam = async (id: string, data: { name?: string; managerId?: 
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to update team');
   }
 };
 
@@ -53,7 +56,8 @@ export const getTeamById = async (id: string) => {
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to fetch team');
   }
 };
 
@@ -67,7 +71,8 @@ export const getTeamsByManager = async (managerId: string) => {
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to fetch teams');
   }
 };
 
@@ -81,6 +86,7 @@ export const deleteTeam = async (id: string) => {
     return response.data;
   } catch (error: unknown) {
     console.error(error);
-    throw new Error(error instanceof Error ? (error.response?.data?.error || error.message) : 'Unknown error');
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to delete team');
   }
 };
