@@ -138,7 +138,5 @@
 	"server/routes/chatRoutes.ts": "Express router handling chat-related API endpoints for sending messages to an LLM and retrieving chat history for specific goals, with user authentication middleware.",
 	"server/routes/goalRoutes.ts": "Express router handling goal-related API endpoints with user authentication, supporting operations like retrieving, saving, submitting goals, adding comments, and managing goal interactions with role-based access control.",
 	"server/services/chatService.ts": "Chat service managing AI-powered conversations for goal tracking, handling message processing, chat history retrieval, and context generation for language model interactions.",
-	"server/services/goalService.ts": "Goal service managing user goal lifecycle, providing methods for creating, submitting, commenting on, and retrieving goals with integrated email notifications and comprehensive error handling.",
-	"shared/dist/types/user.d.ts": "TypeScript type definitions for user-related data models, including enums for user roles, interfaces for users, teams, week goals, comments, replies, automation settings, and chat messages.",
-	"shared/dist/types/user.d.ts.map": "TypeScript source map for user-related type definitions, providing type interfaces for user profiles, authentication, and metadata structures."
+	"server/services/goalService.ts": "Goal service managing user goal lifecycle, providing methods for creating, submitting, commenting on, and retrieving goals with integrated email notifications and comprehensive error handling."
 }
