@@ -20,7 +20,7 @@ class TeamService {
       console.log('Fetching all teams from database');
       const teams = await Team.find()
         .populate('managerId', 'email name role')
-        .populate('icIds', 'email name role teamId')
+        .populate('icIds', 'email name role teamId createdAt updatedAt')
         .exec();
       console.log(`Successfully fetched ${teams.length} teams`);
 
@@ -49,7 +49,7 @@ class TeamService {
       console.log(`Fetching team with ID: ${id}`);
       const team = await Team.findById(id)
         .populate('managerId', 'email name role')
-        .populate('icIds', 'email name role teamId')
+        .populate('icIds', 'email name role teamId createdAt updatedAt')
         .exec();
       if (team) {
         console.log(`Successfully fetched team: ${team.name}`);
@@ -79,7 +79,7 @@ class TeamService {
       console.log(`Fetching teams for manager ID: ${managerId}`);
       const teams = await Team.find({ managerId: new mongoose.Types.ObjectId(managerId) })
         .populate('managerId', 'email name role')
-        .populate('icIds', 'email name role teamId')
+        .populate('icIds', 'email name role teamId createdAt updatedAt')
         .exec();
       console.log(`Successfully fetched ${teams.length} teams for manager ${managerId}`);
 
@@ -152,7 +152,7 @@ class TeamService {
 
       const populatedTeam = await Team.findById(team._id)
         .populate('managerId', 'email name role')
-        .populate('icIds', 'email name role teamId')
+        .populate('icIds', 'email name role teamId createdAt updatedAt')
         .exec();
 
       if (!populatedTeam) {
@@ -235,7 +235,7 @@ class TeamService {
         { new: true }
       )
         .populate('managerId', 'email name role')
-        .populate('icIds', 'email name role teamId')
+        .populate('icIds', 'email name role teamId createdAt updatedAt')
         .exec();
 
       console.log(`Successfully updated team ${id}`);

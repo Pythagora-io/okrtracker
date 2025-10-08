@@ -129,7 +129,7 @@
 	"server/routes/userRoutes.ts": "Express router for user management, providing endpoints for listing, retrieving, inviting, updating, and deleting users with role-based access control and comprehensive error handling.",
 	"server/services/inviteService.ts": "User invitation management service with methods for generating invite tokens, creating invites, validating invite tokens, completing signup, and resending invitations with secure token generation and email notifications.",
 	"server/services/settingsService.ts": "Service for managing automation settings, providing methods to retrieve and update configuration parameters like day, time, and timezone with robust error handling and default value generation.",
-	"server/services/teamService.ts": "Team service with CRUD operations for managing teams, handling team creation, retrieval, updates, and deletion while validating user roles and managing team member associations.",
+	"server/services/teamService.ts": "Team service with CRUD operations for managing teams, handling team creation, retrieval, updates, and deletion while validating user roles and managing team-user relationships.",
 	"server/scripts/seedAdmin.ts": "Database seeding script for creating an initial admin user with predefined credentials, handling environment variables and preventing duplicate admin creation.",
 	"server/services/emailService.ts": "Postmark-based email service for OKRFlow, handling user invite, goal/result submission, comment notifications, and weekly reminders with customized HTML email templates.",
 	"client/src/components/EditUserDialog.tsx": "React dialog component for editing user details, allowing modifications to user name, role, and team assignment with dynamic form validation and state management.",

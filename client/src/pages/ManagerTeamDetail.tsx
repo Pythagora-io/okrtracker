@@ -94,9 +94,11 @@ export const ManagerTeamDetail: React.FC = () => {
                     <Mail className="h-4 w-4" />
                     {ic.email}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Last activity: {format(new Date(ic.updatedAt), 'MMM d, yyyy')}
-                  </div>
+                  {ic.updatedAt && (
+                    <div className="text-xs text-muted-foreground">
+                      Last activity: {format(new Date(ic.updatedAt), 'MMM d, yyyy')}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
