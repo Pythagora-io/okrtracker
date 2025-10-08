@@ -1,6 +1,7 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import UserService from '../services/userService';
+import InviteService from '../services/inviteService';
 import { requireUser } from './middlewares/auth';
 import User from '../models/User';
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
@@ -131,6 +132,70 @@ router.post('/refresh', async (req: Request, res: Response) => {
 
 router.get('/me', requireUser(ALL_ROLES), async (req: AuthRequest, res: Response) => {
   return res.status(200).json(req.user);
+});
+
+// Description: Verify invite token
+// Endpoint: GET /api/auth/invite/:token
+// Request: {}
+// Response: { valid: boolean, email?: string, role?: string }
+router.get('/invite/:token', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    console.log(`Verifying invite token: ${token}`);
+
+    const user = await InviteService.getInviteByToken(token);
+
+    if (!user) {
+      return res.status(400).json({
+        valid: false,
+        message: 'Invalid or expired invite token',
+      });
+    }
+
+    res.status(200).json({
+      valid: true,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error verifying invite token:', errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+// Description: Complete invite signup
+// Endpoint: POST /api/auth/signup-invite
+// Request: { token: string, password: string, name?: string }
+// Response: { user: User, accessToken: string, refreshToken: string }
+router.post('/signup-invite', async (req: Request, res: Response) => {
+  try {
+    const { token, password, name } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Token and password are required' });
+    }
+
+    console.log(`Completing invite signup for token: ${token}`);
+
+    const user = await InviteService.completeInviteSignup(token, password, name);
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.status(200).json({
+      ...user.toObject(),
+      accessToken,
+      refreshToken,
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error completing invite signup:', errorMessage);
+    res.status(400).json({ error: errorMessage });
+  }
 });
 
 export default router;

@@ -1,6 +1,7 @@
 const ROLES = {
   ADMIN: 'admin',
-  USER: 'user'
+  MANAGER: 'manager',
+  IC: 'ic'
 } as const;
 
 type RoleValues = typeof ROLES[keyof typeof ROLES];

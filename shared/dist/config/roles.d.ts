@@ -1,6 +1,7 @@
 declare const ROLES: {
     readonly ADMIN: "admin";
-    readonly USER: "user";
+    readonly MANAGER: "manager";
+    readonly IC: "ic";
 };
 type RoleValues = typeof ROLES[keyof typeof ROLES];
 declare const ALL_ROLES: RoleValues[];

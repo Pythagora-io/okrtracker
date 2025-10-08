@@ -10,16 +10,28 @@ interface CreateUserData {
 class UserService {
   static async list(): Promise<IUser[]> {
     try {
-      return await User.find();
+      console.log('Fetching all users from database');
+      const users = await User.find().populate('teamId', 'name').exec();
+      console.log(`Successfully fetched ${users.length} users`);
+      return users;
     } catch (err) {
+      console.error('Error listing users:', err);
       throw new Error(`Database error while listing users: ${err}`);
     }
   }
 
   static async get(id: string): Promise<IUser | null> {
     try {
-      return await User.findOne({ _id: id }).exec();
+      console.log(`Fetching user with ID: ${id}`);
+      const user = await User.findOne({ _id: id }).populate('teamId', 'name').exec();
+      if (user) {
+        console.log(`Successfully fetched user: ${user.email}`);
+      } else {
+        console.log(`User with ID ${id} not found`);
+      }
+      return user;
     } catch (err) {
+      console.error(`Error getting user ${id}:`, err);
       throw new Error(`Database error while getting the user by their ID: ${err}`);
     }
   }

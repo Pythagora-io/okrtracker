@@ -6,11 +6,16 @@ import { ROLES } from 'shared';
 export interface IUser extends Document {
   email: string;
   password: string;
+  name?: string;
   createdAt: Date;
   lastLoginAt: Date;
   isActive: boolean;
   role: string;
   refreshToken: string;
+  teamId?: mongoose.Types.ObjectId;
+  inviteToken?: string;
+  inviteExpires?: Date;
+  invitedBy?: mongoose.Types.ObjectId;
 }
 
 const schema = new Schema<IUser>({
@@ -39,16 +44,39 @@ const schema = new Schema<IUser>({
     type: Boolean,
     default: true,
   },
+  name: {
+    type: String,
+    required: false,
+  },
   role: {
     type: String,
-    enum: [ROLES.ADMIN, ROLES.USER],
-    default: ROLES.USER,
+    enum: [ROLES.ADMIN, ROLES.MANAGER, ROLES.IC],
+    default: ROLES.IC,
   },
   refreshToken: {
     type: String,
     unique: true,
     index: true,
     default: () => randomUUID(),
+  },
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Team',
+    required: false,
+  },
+  inviteToken: {
+    type: String,
+    required: false,
+    index: true,
+  },
+  inviteExpires: {
+    type: Date,
+    required: false,
+  },
+  invitedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
   },
 }, {
   versionKey: false,

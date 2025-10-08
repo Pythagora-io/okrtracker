@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/useToast';
 import { Lock, CheckCircle2 } from 'lucide-react';
+import { verifyInviteToken, signupWithInvite } from '@/api/auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const SetupPassword: React.FC = () => {
-  const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const getPasswordStrength = (pwd: string) => {
     if (pwd.length === 0) return { strength: 0, label: '', color: '' };
@@ -24,6 +32,48 @@ export const SetupPassword: React.FC = () => {
   };
 
   const passwordStrength = getPasswordStrength(password);
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (!token) {
+        toast({
+          title: 'Error',
+          description: 'Invalid invite link',
+          variant: 'destructive'
+        });
+        navigate('/login');
+        return;
+      }
+
+      try {
+        setVerifying(true);
+        const result = await verifyInviteToken(token);
+        if (result.valid) {
+          setInviteEmail(result.email);
+          setInviteRole(result.role);
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Invalid or expired invite link',
+            variant: 'destructive'
+          });
+          navigate('/login');
+        }
+      } catch (error) {
+        const err = error as Error;
+        toast({
+          title: 'Error',
+          description: err.message,
+          variant: 'destructive'
+        });
+        navigate('/login');
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    verifyToken();
+  }, [token, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,19 +96,30 @@ export const SetupPassword: React.FC = () => {
       return;
     }
 
+    if (!token) {
+      toast({
+        title: 'Error',
+        description: 'Invalid invite token',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const result = await signupWithInvite(token, password, name);
+
+      // Login the user with auth context
+      authLogin(result);
+
       toast({
         title: 'Success',
-        description: 'Password set successfully. Redirecting to login...'
+        description: 'Account setup complete. Redirecting...'
       });
 
       setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        navigate('/');
+      }, 1000);
     } catch (error) {
       const err = error as Error;
       toast({
@@ -71,6 +132,19 @@ export const SetupPassword: React.FC = () => {
     }
   };
 
+  if (verifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="text-muted-foreground">Verifying invite...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md">
@@ -82,11 +156,22 @@ export const SetupPassword: React.FC = () => {
           </div>
           <CardTitle className="text-2xl text-center">Set Your Password</CardTitle>
           <CardDescription className="text-center">
-            Create a secure password for your account
+            Complete your account setup for {inviteEmail}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name (Optional)</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">New Password</Label>
               <Input
