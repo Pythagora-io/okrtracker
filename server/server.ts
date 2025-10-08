@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import teamRoutes from './routes/teamRoutes';
 import settingsRoutes from './routes/settingsRoutes';
+import goalRoutes from './routes/goalRoutes';
+import chatRoutes from './routes/chatRoutes';
 import { connectDB } from './config/database';
 import cors from 'cors';
 
@@ -47,6 +49,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/teams', teamRoutes);
 // Settings Routes
 app.use('/api/settings', settingsRoutes);
+// Goal Routes
+app.use('/api/goals', goalRoutes);
+// Chat Routes
+app.use('/api/chat', chatRoutes);
 
 // If no routes handled the request, it's a 404
 app.use((req: Request, res: Response) => {

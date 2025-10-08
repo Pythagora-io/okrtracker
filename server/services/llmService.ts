@@ -4,13 +4,33 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization of clients to avoid errors when API keys are not set
+let openai: OpenAI | null = null;
+let anthropic: Anthropic | null = null;
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
+
+function getAnthropicClient(): Anthropic {
+  if (!anthropic) {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error('ANTHROPIC_API_KEY environment variable is not set');
+    }
+    anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+  }
+  return anthropic;
+}
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
@@ -20,9 +40,10 @@ async function sleep(ms: number): Promise<void> {
 }
 
 async function sendRequestToOpenAI(model: string, message: string): Promise<string> {
+  const client = getOpenAIClient();
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      const response = await openai.chat.completions.create({
+      const response = await client.chat.completions.create({
         model: model,
         messages: [{ role: 'user', content: message }],
         max_tokens: 1024,
@@ -40,15 +61,16 @@ async function sendRequestToOpenAI(model: string, message: string): Promise<stri
 }
 
 async function sendRequestToAnthropic(model: string, message: string): Promise<string> {
+  const client = getAnthropicClient();
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      console.log(`Sending request to Anthropic with model: ${model} and message: ${message}`);
-      const response = await anthropic.messages.create({
+      console.log(`Sending request to Anthropic with model: ${model}`);
+      const response = await client.messages.create({
         model: model,
         messages: [{ role: 'user', content: message }],
         max_tokens: 1024,
       });
-      console.log(`Received response from Anthropic: ${JSON.stringify(response.content)}`);
+      console.log(`Received response from Anthropic`);
       return response.content[0].type === 'text' ? response.content[0].text : '';
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

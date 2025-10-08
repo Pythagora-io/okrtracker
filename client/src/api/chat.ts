@@ -6,27 +6,14 @@ import { ChatMessage } from '../../../shared/types/user';
 // Request: { goalId: string, userId: string, message: string }
 // Response: { success: boolean, message: ChatMessage }
 export const sendChatMessage = async (data: { goalId: string; userId: string; message: string }) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: {
-          _id: Math.random().toString(),
-          role: 'assistant',
-          content: 'Based on the results submitted, the main accomplishments this week include completing the OKR tracking tool frontend implementation, successfully integrating the rich text editor with commenting functionality, and delivering all planned features on time. The work demonstrates strong technical execution and attention to detail.',
-          createdAt: new Date().toISOString()
-        }
-      });
-    }, 1500);
-  });
-  // Uncomment the below lines to make an actual API call
-  // try {
-  //   const response = await api.post('/api/chat/results', data);
-  //   return response.data;
-  // } catch (error: any) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+  try {
+    const response = await api.post('/api/chat/results', data);
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error sending chat message:', error);
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to send chat message');
+  }
 };
 
 // Description: Get chat history for a goal
@@ -34,19 +21,12 @@ export const sendChatMessage = async (data: { goalId: string; userId: string; me
 // Request: {}
 // Response: { messages: ChatMessage[] }
 export const getChatHistory = async (goalId: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        messages: []
-      });
-    }, 500);
-  });
-  // Uncomment the below lines to make an actual API call
-  // try {
-  //   const response = await api.get(`/api/chat/results/${goalId}`);
-  //   return response.data;
-  // } catch (error: any) {
-  //   throw new Error(error?.response?.data?.message || error.message);
-  // }
+  try {
+    const response = await api.get(`/api/chat/results/${goalId}`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error fetching chat history:', error);
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    throw new Error(err?.response?.data?.error || err?.message || 'Failed to fetch chat history');
+  }
 };
