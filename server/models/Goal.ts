@@ -114,7 +114,7 @@ const goalSchema = new Schema<IGoal>({
   },
   goalsContent: {
     type: String,
-    required: true,
+    default: '',
   },
   resultsContent: {
     type: String,

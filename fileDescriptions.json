@@ -136,7 +136,7 @@
 	"server/models/ChatMessage.ts": "Mongoose schema and model for chat messages, defining structure for storing user and assistant messages with goal and user references.",
 	"server/models/Goal.ts": "Mongoose schema for weekly goals, defining data structure with user-associated goals, comments, replies, and metadata for tracking goal progress and interactions.",
 	"server/routes/chatRoutes.ts": "Express router handling chat-related API endpoints for sending messages to an LLM and retrieving chat history for specific goals, with user authentication middleware.",
-	"server/routes/goalRoutes.ts": "Express router handling goal-related operations with endpoints for retrieving, saving, submitting, and commenting on user goals, including role-based authorization and comprehensive error handling.",
+	"server/routes/goalRoutes.ts": "Express router handling goal-related API endpoints with user authentication, supporting operations like retrieving, saving, submitting goals, adding comments, and managing goal interactions with role-based access control.",
 	"server/services/chatService.ts": "Chat service managing AI-powered conversations for goal tracking, handling message processing, chat history retrieval, and context generation for language model interactions.",
 	"server/services/goalService.ts": "Goal service managing user goal lifecycle, providing methods for creating, submitting, commenting on, and retrieving goals with integrated email notifications and error handling."
 }

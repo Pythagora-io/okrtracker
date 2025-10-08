@@ -69,10 +69,10 @@ router.get('/:goalId', requireUser(), async (req: AuthRequest, res: Response) =>
 // Response: { success: boolean, message: string, goal: Goal }
 router.post('/', requireUser(), async (req: AuthRequest, res: Response) => {
   try {
-    const { userId, weekStart, weekEnd, goalsContent } = req.body;
+    const { userId, weekStart, weekEnd, goalsContent = '' } = req.body;
 
     // Validate required fields
-    if (!userId || !weekStart || !weekEnd || !goalsContent) {
+    if (!userId || !weekStart || !weekEnd) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
