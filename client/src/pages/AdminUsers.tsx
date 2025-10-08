@@ -40,7 +40,13 @@ export const AdminUsers: React.FC = () => {
         getTeams()
       ]);
       setUsers((usersData as { users: User[] }).users);
-      setTeams((teamsData as { teams: Team[] }).teams);
+      const fetchedTeams = (teamsData as { teams: Team[] }).teams;
+      // Ensure all teams have a name property, even if it's empty
+      const normalizedTeams = fetchedTeams.map(team => ({
+        ...team,
+        name: team.name || 'Unnamed Team'
+      }));
+      setTeams(normalizedTeams);
     } catch (error) {
       const err = error as Error;
       toast({

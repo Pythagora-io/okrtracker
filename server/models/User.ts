@@ -8,6 +8,7 @@ export interface IUser extends Document {
   password: string;
   name?: string;
   createdAt: Date;
+  updatedAt: Date;
   lastLoginAt: Date;
   isActive: boolean;
   role: string;
@@ -30,11 +31,6 @@ const schema = new Schema<IUser>({
     type: String,
     required: true,
     validate: { validator: isPasswordHash, message: 'Invalid password hash' },
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true,
   },
   lastLoginAt: {
     type: Date,
@@ -79,6 +75,7 @@ const schema = new Schema<IUser>({
     required: false,
   },
 }, {
+  timestamps: true,
   versionKey: false,
 });
 
