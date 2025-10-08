@@ -45,7 +45,7 @@ export const AdminUsers: React.FC = () => {
       const err = error as Error;
       toast({
         title: 'Error',
-        description: error.message,
+        description: err.message,
         variant: 'destructive'
       });
     } finally {

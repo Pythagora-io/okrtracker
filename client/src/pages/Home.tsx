@@ -1,12 +1,19 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserRole } from '../../../shared/types/user';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    const userRole = localStorage.getItem('userRole') as UserRole || UserRole.IC;
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    const userRole = currentUser.role as UserRole || UserRole.IC;
 
     switch (userRole) {
       case UserRole.ADMIN:
@@ -21,7 +28,7 @@ export const Home: React.FC = () => {
       default:
         navigate('/ic/goals');
     }
-  }, [navigate]);
+  }, [navigate, currentUser]);
 
   return (
     <div className="flex items-center justify-center h-full">
