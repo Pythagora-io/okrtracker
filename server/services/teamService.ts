@@ -15,7 +15,7 @@ interface UpdateTeamData {
 }
 
 class TeamService {
-  static async list(): Promise<ITeam[]> {
+  static async list(): Promise<unknown[]> {
     try {
       console.log('Fetching all teams from database');
       const teams = await Team.find()
@@ -23,14 +23,28 @@ class TeamService {
         .populate('icIds', 'email name role teamId')
         .exec();
       console.log(`Successfully fetched ${teams.length} teams`);
-      return teams;
+
+      // Transform teams to include managerName and ics array
+      return teams.map(team => {
+        const manager = team.managerId as unknown as { name?: string; email: string };
+        return {
+          _id: team._id,
+          name: team.name,
+          managerId: team.managerId,
+          managerName: manager?.name || manager?.email || 'Unknown',
+          icIds: team.icIds,
+          ics: team.icIds,
+          createdAt: team.createdAt,
+          updatedAt: team.updatedAt,
+        };
+      });
     } catch (err) {
       console.error('Error listing teams:', err);
       throw new Error(`Database error while listing teams: ${err}`);
     }
   }
 
-  static async get(id: string): Promise<ITeam | null> {
+  static async get(id: string): Promise<unknown | null> {
     try {
       console.log(`Fetching team with ID: ${id}`);
       const team = await Team.findById(id)
@@ -39,17 +53,28 @@ class TeamService {
         .exec();
       if (team) {
         console.log(`Successfully fetched team: ${team.name}`);
+        const manager = team.managerId as unknown as { name?: string; email: string };
+        return {
+          _id: team._id,
+          name: team.name,
+          managerId: team.managerId,
+          managerName: manager?.name || manager?.email || 'Unknown',
+          icIds: team.icIds,
+          ics: team.icIds,
+          createdAt: team.createdAt,
+          updatedAt: team.updatedAt,
+        };
       } else {
         console.log(`Team with ID ${id} not found`);
       }
-      return team;
+      return null;
     } catch (err) {
       console.error(`Error getting team ${id}:`, err);
       throw new Error(`Database error while getting team: ${err}`);
     }
   }
 
-  static async getByManager(managerId: string): Promise<ITeam[]> {
+  static async getByManager(managerId: string): Promise<unknown[]> {
     try {
       console.log(`Fetching teams for manager ID: ${managerId}`);
       const teams = await Team.find({ managerId: new mongoose.Types.ObjectId(managerId) })
@@ -57,17 +82,29 @@ class TeamService {
         .populate('icIds', 'email name role teamId')
         .exec();
       console.log(`Successfully fetched ${teams.length} teams for manager ${managerId}`);
-      teams.forEach(team => {
+
+      // Transform teams to include managerName and ics array
+      return teams.map(team => {
+        const manager = team.managerId as unknown as { name?: string; email: string };
         console.log(`Team ${team.name}: ${team.icIds?.length || 0} ICs`, team.icIds);
+        return {
+          _id: team._id,
+          name: team.name,
+          managerId: team.managerId,
+          managerName: manager?.name || manager?.email || 'Unknown',
+          icIds: team.icIds,
+          ics: team.icIds,
+          createdAt: team.createdAt,
+          updatedAt: team.updatedAt,
+        };
       });
-      return teams;
     } catch (err) {
       console.error(`Error getting teams for manager ${managerId}:`, err);
       throw new Error(`Database error while getting teams by manager: ${err}`);
     }
   }
 
-  static async create({ name, managerId, icIds }: CreateTeamData): Promise<ITeam> {
+  static async create({ name, managerId, icIds }: CreateTeamData): Promise<unknown> {
     if (!name) throw new Error('Team name is required');
     if (!managerId) throw new Error('Manager ID is required');
 
@@ -118,14 +155,28 @@ class TeamService {
         .populate('icIds', 'email name role teamId')
         .exec();
 
-      return populatedTeam!;
+      if (!populatedTeam) {
+        throw new Error('Failed to fetch created team');
+      }
+
+      const managerData = populatedTeam.managerId as unknown as { name?: string; email: string };
+      return {
+        _id: populatedTeam._id,
+        name: populatedTeam.name,
+        managerId: populatedTeam.managerId,
+        managerName: managerData?.name || managerData?.email || 'Unknown',
+        icIds: populatedTeam.icIds,
+        ics: populatedTeam.icIds,
+        createdAt: populatedTeam.createdAt,
+        updatedAt: populatedTeam.updatedAt,
+      };
     } catch (err) {
       console.error('Error creating team:', err);
       throw new Error(`Database error while creating team: ${err}`);
     }
   }
 
-  static async update(id: string, data: UpdateTeamData): Promise<ITeam | null> {
+  static async update(id: string, data: UpdateTeamData): Promise<unknown | null> {
     try {
       console.log(`Updating team ${id} with data:`, data);
 
@@ -188,7 +239,22 @@ class TeamService {
         .exec();
 
       console.log(`Successfully updated team ${id}`);
-      return updatedTeam;
+
+      if (!updatedTeam) {
+        return null;
+      }
+
+      const managerData = updatedTeam.managerId as unknown as { name?: string; email: string };
+      return {
+        _id: updatedTeam._id,
+        name: updatedTeam.name,
+        managerId: updatedTeam.managerId,
+        managerName: managerData?.name || managerData?.email || 'Unknown',
+        icIds: updatedTeam.icIds,
+        ics: updatedTeam.icIds,
+        createdAt: updatedTeam.createdAt,
+        updatedAt: updatedTeam.updatedAt,
+      };
     } catch (err) {
       console.error(`Error updating team ${id}:`, err);
       throw new Error(`Database error while updating team: ${err}`);

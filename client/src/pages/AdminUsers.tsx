@@ -157,7 +157,7 @@ export const AdminUsers: React.FC = () => {
   };
 
   const managers = users.filter(u => u.role === UserRole.MANAGER);
-  const ics = users.filter(u => u.role === UserRole.IC && !u.teamId);
+  const ics = users.filter(u => u.role === UserRole.IC);
 
   if (loading) {
     return (

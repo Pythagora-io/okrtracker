@@ -100,9 +100,9 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({ user, onUpdate, 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">No team</SelectItem>
-                  {teams.map((team) => (
+                  {teams && teams.length > 0 && teams.map((team) => (
                     <SelectItem key={team._id} value={team._id}>
-                      {team.name}
+                      {team?.name || 'Unnamed Team'}
                     </SelectItem>
                   ))}
                 </SelectContent>
