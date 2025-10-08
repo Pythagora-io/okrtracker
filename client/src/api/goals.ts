@@ -1,5 +1,5 @@
 import api from './api';
-import { WeekGoal, Comment, Reply } from '../../../shared/types/user';
+import { WeekGoal, Comment, Reply, UserRole } from '../../../shared/types/user';
 
 // Description: Get goals for a user
 // Endpoint: GET /api/goals/user/:userId
@@ -12,10 +12,10 @@ export const getGoalsByUser = async (userId: string) => {
       const today = new Date();
       const currentWeekStart = new Date(today);
       currentWeekStart.setDate(today.getDate() - today.getDay());
-      
+
       const lastWeekStart = new Date(currentWeekStart);
       lastWeekStart.setDate(currentWeekStart.getDate() - 7);
-      
+
       const nextWeekStart = new Date(currentWeekStart);
       nextWeekStart.setDate(currentWeekStart.getDate() + 7);
 
@@ -44,7 +44,7 @@ export const getGoalsByUser = async (userId: string) => {
                 _id: 'c1',
                 userId: '2',
                 userName: 'Manager User',
-                userRole: 'manager' as any,
+                userRole: UserRole.MANAGER,
                 text: 'Great work on the architecture!',
                 highlightedText: 'architecture design',
                 position: 150,

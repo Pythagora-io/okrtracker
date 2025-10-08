@@ -121,5 +121,9 @@
 	"client/src/pages/ICGoals.tsx": "Individual contributor goals management page with functionality to set, save, submit, and comment on weekly goals and results, featuring rich text editing and interactive comment threads.",
 	"client/src/pages/ManagerICDetail.tsx": "Manager-facing individual contributor (IC) detail page with comprehensive goal tracking, commenting, and chat functionality for weekly objectives and results.",
 	"client/src/pages/ManagerTeamDetail.tsx": "React component for displaying detailed team information, rendering team members' cards with individual details and navigation options for managers.",
-	"client/src/pages/SetupPassword.tsx": "React component for password setup with strength validation, password matching, and secure form submission, featuring a visually appealing UI with loading states and toast notifications."
+	"client/src/pages/SetupPassword.tsx": "React component for password setup with strength validation, password matching, and secure form submission, featuring a visually appealing UI with loading states and toast notifications.",
+	"shared/dist/types/user.d.ts": "TypeScript type definitions for user-related data models, including enums for user roles, interfaces for users, teams, week goals, comments, replies, automation settings, and chat messages.",
+	"shared/dist/types/user.d.ts.map": "TypeScript type definitions for user-related interfaces, including user profiles, authentication, roles, and metadata structures.",
+	"shared/dist/types/user.js": "TypeScript enum defining user role types with ADMIN, MANAGER, and IC role constants for role-based access control.",
+	"shared/dist/types/user.js.map": "Source map for user type definitions, tracking TypeScript compilation details for user-related enumerations and type information."
 }
