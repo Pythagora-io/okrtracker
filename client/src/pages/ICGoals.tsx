@@ -9,8 +9,11 @@ import { RichTextEditor } from '@/components/RichTextEditor';
 import { CommentThread } from '@/components/CommentThread';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
+import { generateWeeks } from '@/utils/dateUtils';
 
 export const ICGoals: React.FC = () => {
+  const { user } = useAuth();
   const [goals, setGoals] = useState<WeekGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingGoals, setSavingGoals] = useState<{ [key: string]: boolean }>({});
@@ -19,22 +22,51 @@ export const ICGoals: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    loadGoals();
-  }, []);
+    if (user) {
+      loadGoals();
+    }
+  }, [user]);
 
   const loadGoals = async () => {
+    if (!user) return;
+
     try {
       setLoading(true);
-      const userId = '3';
-      const data = await getGoalsByUser(userId);
+      const data = await getGoalsByUser(user._id);
       const goalsData = (data as { goals: WeekGoal[] }).goals;
-      setGoals(goalsData);
 
-      const resultsMap: { [key: string]: string } = {};
-      goalsData.forEach((goal: WeekGoal) => {
-        resultsMap[goal._id] = goal.resultsContent || '';
-      });
-      setResultsText(resultsMap);
+      // If no goals exist, create empty goals for current and past weeks
+      if (goalsData.length === 0) {
+        const weeks = generateWeeks(12);
+        const currentWeek = weeks[0];
+
+        // Create a goal entry for the current week
+        await saveGoals({
+          userId: user._id,
+          weekStart: currentWeek.start,
+          weekEnd: currentWeek.end,
+          goalsContent: ''
+        });
+
+        // Reload goals after creating the initial entry
+        const updatedData = await getGoalsByUser(user._id);
+        const updatedGoals = (updatedData as { goals: WeekGoal[] }).goals;
+        setGoals(updatedGoals);
+
+        const resultsMap: { [key: string]: string } = {};
+        updatedGoals.forEach((goal: WeekGoal) => {
+          resultsMap[goal._id] = goal.resultsContent || '';
+        });
+        setResultsText(resultsMap);
+      } else {
+        setGoals(goalsData);
+
+        const resultsMap: { [key: string]: string } = {};
+        goalsData.forEach((goal: WeekGoal) => {
+          resultsMap[goal._id] = goal.resultsContent || '';
+        });
+        setResultsText(resultsMap);
+      }
     } catch (error) {
       const err = error as Error;
       toast({
@@ -48,12 +80,14 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleSaveGoals = async (goalId: string, content: string) => {
+    if (!user) return;
+
     try {
       setSavingGoals({ ...savingGoals, [goalId]: true });
       const goal = goals.find(g => g._id === goalId);
       if (goal) {
         await saveGoals({
-          userId: '3',
+          userId: user._id,
           weekStart: goal.weekStart,
           weekEnd: goal.weekEnd,
           goalsContent: content
@@ -100,11 +134,13 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleAddComment = async (goalId: string, text: string, position: number) => {
+    if (!user) return;
+
     try {
       const comment = await addComment(goalId, {
-        userId: '3',
-        userName: 'IC User 1',
-        userRole: 'ic',
+        userId: user._id,
+        userName: user.name || user.email,
+        userRole: user.role,
         text,
         highlightedText: text,
         position
@@ -131,10 +167,12 @@ export const ICGoals: React.FC = () => {
   };
 
   const handleReplyToComment = async (goalId: string, commentId: string, text: string) => {
+    if (!user) return;
+
     try {
       const reply = await replyToComment(goalId, commentId, {
-        userId: '3',
-        userName: 'IC User 1',
+        userId: user._id,
+        userName: user.name || user.email,
         text
       });
 
@@ -256,8 +294,8 @@ export const ICGoals: React.FC = () => {
                           comment={comment}
                           onReply={(commentId, text) => handleReplyToComment(goal._id, commentId, text)}
                           onResolve={(commentId) => handleResolveComment(goal._id, commentId)}
-                          currentUserId="3"
-                          currentUserName="IC User 1"
+                          currentUserId={user?._id || ''}
+                          currentUserName={user?.name || user?.email || ''}
                         />
                       ))}
                     </div>
