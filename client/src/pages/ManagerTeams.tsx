@@ -6,26 +6,33 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/useToast';
 import { Users, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const ManagerTeams: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadTeams();
   }, []);
 
   const loadTeams = async () => {
+    if (!user) {
+      console.error('No authenticated user found');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      // In real implementation, get current user ID from auth context
-      const managerId = '2'; // Mock manager ID
-      const data = await getTeamsByManager(managerId);
+      const data = await getTeamsByManager(user._id);
       setTeams((data as { teams: Team[] }).teams);
     } catch (error) {
       const err = error as Error;
+      console.error('Error loading teams:', err);
       toast({
         title: 'Error',
         description: err.message,
