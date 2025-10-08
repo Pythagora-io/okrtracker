@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
-import { Bold, Italic, List, ListOrdered, Heading2, MessageSquarePlus } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading2, MessageSquarePlus, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
+import { Card } from './ui/card';
 import { cn } from '@/lib/utils';
 
 interface RichTextEditorProps {
@@ -22,10 +24,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Start typing...'
 }) => {
   const [showCommentButton, setShowCommentButton] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [commentText, setCommentText] = useState('');
   const [selectedText, setSelectedText] = useState('');
   const [selectionPosition, setSelectionPosition] = useState(0);
-  const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
-  const [activeCommentInput, setActiveCommentInput] = useState<string | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -40,12 +42,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     onSelectionUpdate: ({ editor }) => {
       const { from, to } = editor.state.selection;
       const text = editor.state.doc.textBetween(from, to, ' ');
-      
-      if (text.length > 0 && !readOnly && onAddComment) {
+
+      if (text.length > 0 && !readOnly && onAddComment && !showCommentInput) {
         setSelectedText(text);
         setSelectionPosition(from);
         setShowCommentButton(true);
-      } else {
+      } else if (!showCommentInput) {
         setShowCommentButton(false);
       }
     }
@@ -57,25 +59,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [content, editor]);
 
-  const handleAddComment = () => {
-    if (onAddComment && selectedText) {
-      onAddComment(selectedText, selectionPosition);
-      setShowCommentButton(false);
+  const handleShowCommentInput = () => {
+    setShowCommentButton(false);
+    setShowCommentInput(true);
+  };
+
+  const handleSubmitComment = () => {
+    if (onAddComment && commentText.trim() && selectedText) {
+      onAddComment(commentText, selectionPosition);
+      setShowCommentInput(false);
+      setCommentText('');
+      setSelectedText('');
       editor?.commands.setTextSelection({ from: 0, to: 0 });
-      
-      const { from, to } = editor.state.selection
-      const text = editor.state.doc.textBetween(from, to)
-      
-      const newCommentId = `temp-${from}-${to}`
-      setActiveCommentInput(newCommentId)
-      
-      setTimeout(() => {
-        const inputElement = document.querySelector(`[data-comment-input="${newCommentId}"]`)
-        if (inputElement instanceof HTMLElement) {
-          inputElement.focus()
-        }
-      }, 100)
     }
+  };
+
+  const handleCancelComment = () => {
+    setShowCommentInput(false);
+    setCommentText('');
+    setShowCommentButton(false);
+    editor?.commands.setTextSelection({ from: 0, to: 0 });
   };
 
   if (!editor) {
@@ -133,7 +136,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Button>
         </div>
       )}
-      
+
       <div className={cn(
         "prose prose-sm max-w-none p-4 min-h-[200px] focus:outline-none",
         !readOnly && "border rounded-b-lg bg-background",
@@ -147,13 +150,59 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <Button
             type="button"
             size="sm"
-            onClick={handleAddComment}
+            onClick={handleShowCommentInput}
             className="shadow-lg"
           >
             <MessageSquarePlus className="h-4 w-4 mr-2" />
             Add Comment
           </Button>
         </div>
+      )}
+
+      {showCommentInput && (
+        <Card className="absolute top-12 right-4 z-10 p-4 w-80 shadow-lg bg-background">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold">Add Comment</h4>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelComment}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="bg-yellow-100 dark:bg-yellow-900/20 px-2 py-1 rounded text-xs italic">
+              "{selectedText}"
+            </div>
+            <Textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Write your comment..."
+              className="min-h-[80px]"
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelComment}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSubmitComment}
+                disabled={!commentText.trim()}
+              >
+                Post Comment
+              </Button>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );
